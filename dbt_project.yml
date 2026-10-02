@@ -1,8 +1,7 @@
 name: 'dbt_ekom_analytics'
+profile: 'ekom_analytics'
 version: '1.0.0'
 config-version: 2
-
-profile: 'default'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -13,3 +12,16 @@ snapshot-paths: ["snapshots"]
 target-path: "target"  
 
 clean-targets: ["target", "dbt_packages"]
+
+models:
+  ekom_analytics:
+    +materialized: table
+    +database: "{{ target.catalog }}"
+    +pre-hook: "{{ audit_start() }}"
+    +post-hook: "{{ audit_end() }}"
+
+    staging:      {+schema: bronze, +materialized: view}
+    intermediate: {+schema: silver}
+    mart:         {+schema: gold}
+
+on-run-start: ["{{ create_audit_schema() }}", "{{ create_audit_table() }}"]
