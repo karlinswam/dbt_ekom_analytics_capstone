@@ -1,5 +1,5 @@
-name: 'dbt_ekom_analytics'
-profile: 'ekom_analytics'
+name: 'dbt_ekom_analytics_capstone'
+profile: 'dbt_ekom_analytics_capstone'
 version: '1.0.0'
 config-version: 2
 
@@ -13,15 +13,19 @@ target-path: "target"
 
 clean-targets: ["target", "dbt_packages"]
 
+seeds: {dbt_ekom_analytics_capstone: {+schema: landing}}
+
 models:
-  ekom_analytics:
+  dbt_ekom_analytics_capstone:
     +materialized: table
     +database: "{{ target.catalog }}"
-    +pre-hook: "{{ audit_start() }}"
-    +post-hook: "{{ audit_end() }}"
+   # +pre-hook: "{{ audit_start() }}"
+   # +post-hook: "{{ audit_end() }}"
 
     staging:      {+schema: bronze, +materialized: view}
     intermediate: {+schema: silver}
     mart:         {+schema: gold}
 
-on-run-start: ["{{ create_audit_schema() }}", "{{ create_audit_table() }}"]
+on-run-start: ["{{ audit_table_create() }}"]
+on-run-end: ["{{ audit_table_log_run_results(results) }}"]
+

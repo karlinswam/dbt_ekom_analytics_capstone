@@ -1,0 +1,11 @@
+version: 2
+sources:
+  - name: landing
+    database: "{{ target.catalog }}"
+    schema: landing
+    description: Raw e-commerce tables loaded through dbt seeds.
+    tables:
+      - name: customers
+      - name: orders
+      - name: products
+      - name: order_items
